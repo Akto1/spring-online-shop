@@ -1,24 +1,14 @@
 package com.example.demo.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.List;
-
+@Getter
+@Setter
 public class OrderDTO {
-    private String customerName;
-    private List<Long> productsIds;
+    private Long userId;
+    private List<OrderItemDTO> items;
 
-    public String getCustomerName() {
-        return customerName;
-    }
 
-    public void setCustomerName(String customerName) {
-        this.customerName = customerName;
-    }
-
-    public List<Long> getProductsIds() {
-        return productsIds;
-    }
-
-    public void setProductsIds(List<Long> productsIds) {
-        this.productsIds = productsIds;
-    }
 }
