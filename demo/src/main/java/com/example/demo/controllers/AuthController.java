@@ -1,6 +1,7 @@
 package com.example.demo.controllers;
 
 import com.example.demo.Exceptions.UserNotFoundException;
+import com.example.demo.dto.UserCreateDTO;
 import com.example.demo.models.Roles;
 import com.example.demo.models.User;
 import com.example.demo.repository.UserRepository;
@@ -19,8 +20,13 @@ public class AuthController {
     private final PasswordEncoder encoder;
 
     @PostMapping("/register")
-    public String register(@Valid @RequestBody  User user){
-        user.setPassword(encoder.encode(user.getPassword()));
+    public String register(@Valid @RequestBody UserCreateDTO dto){
+        User user = new User();
+        user.setName(dto.getName());
+        user.setEmail(dto.getEmail());
+        user.setPassword(dto.getPassword());
+        
+        encoder.encode(user.getPassword());
         if(!user.getEmail().endsWith("@gmail.com") &&  !user.getEmail().endsWith("@mail.ru")){
             throw new UserNotFoundException("Not correct mail!");
         }
