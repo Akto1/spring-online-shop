@@ -5,12 +5,10 @@ import com.example.demo.models.Roles;
 import com.example.demo.models.User;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.JwtService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
@@ -21,8 +19,11 @@ public class AuthController {
     private final PasswordEncoder encoder;
 
     @PostMapping("/register")
-    public String register(@RequestBody User user){
+    public String register(@Valid @RequestBody  User user){
         user.setPassword(encoder.encode(user.getPassword()));
+        if(!user.getEmail().endsWith("@gmail.com") &&  !user.getEmail().endsWith("@mail.ru")){
+            throw new UserNotFoundException("Not correct mail!");
+        }
         if(user.getEmail().equals("belinboris498@gmail.com")){
             user.setRole(Roles.ROLE_ADMIN);
         }
@@ -31,6 +32,14 @@ public class AuthController {
         }
         userRepository.save(user);
         return "User created";
+    }
+
+    @PutMapping("/give/admin/id/{id}")
+    public String changeRole(@PathVariable Long id){
+        User existinguser = userRepository.findById(id).orElseThrow();
+        existinguser.setRole(Roles.ROLE_ADMIN);
+        userRepository.save(existinguser);
+        return "Role for user with id " + existinguser.getId() + " has been changed!";
     }
     @PostMapping("/login")
     public String login(@RequestBody User user){

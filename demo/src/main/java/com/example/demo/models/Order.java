@@ -23,5 +23,8 @@ public class Order {
     @OneToMany(mappedBy = "order",cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     private List<Product> productList;
 
+    @ManyToOne(cascade = CascadeType.ALL)
+    private User user;
+
     private BigDecimal totalPrice;
 }

@@ -25,11 +25,23 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilter (HttpSecurity http) throws Exception{
         http.csrf(csrf -> csrf.disable()).
-                authorizeHttpRequests(auth -> auth.
-                        requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("product/create").hasRole("ADMIN")
+                authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/give/**").hasRole("ADMIN").
+                        // КАТЕГОРИИ
+                    requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/category/create").hasRole("ADMIN")
+                        .requestMatchers("/category/get/**").permitAll()
+                        .requestMatchers("/category/delete/**").hasRole("ADMIN")
+                        // ПРОДУКТЫ
+                        .requestMatchers("/product/create").hasRole("ADMIN")
+                        .requestMatchers("/product/get/**").permitAll()
                         .requestMatchers("/product/delete/**").hasRole("ADMIN")
-                        .requestMatchers("/order/create").hasRole("ADMIN")
+                        .requestMatchers("/product/price/**").permitAll()
+                        .requestMatchers("product/page/**").permitAll()
+                        // ЗАКАЗЫ
+                        .requestMatchers("/order/create").permitAll()
+                        .requestMatchers("/order/get/**").permitAll()
+                        .requestMatchers("/order/delete/**").hasRole("ADMIN")
                         .anyRequest().authenticated()).
                 userDetailsService(userDetailsService).addFilterBefore(filter,UsernamePasswordAuthenticationFilter.class);
         return http.build();

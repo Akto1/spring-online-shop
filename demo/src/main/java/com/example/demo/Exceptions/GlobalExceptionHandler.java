@@ -32,4 +32,21 @@ public class GlobalExceptionHandler {
         error.put("message",ex.getMessage());
         return new ResponseEntity<>(error,HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(ProblemsWithMail.class)
+    public ResponseEntity<Map<String,String>> handleIllegalArgumentException(ProblemsWithMail ex){
+        Map<String,String> error = new HashMap<>();
+        error.put("error","email not found or not exist");
+        error.put("message",ex.getMessage());
+        return new ResponseEntity<>(error,HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(TokenProblem.class)
+    public ResponseEntity<Map<String,String>> handleIllegalArgumentException(TokenProblem ex){
+        Map<String,String> error = new HashMap<>();
+        error.put("error","token expired or not exists!");
+        error.put("message",ex.getMessage());
+        return new ResponseEntity<>(error,HttpStatus.NOT_FOUND);
+    }
+
 }

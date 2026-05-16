@@ -36,7 +36,7 @@ public class ProductService {
     public List<ProductResponseDTO> getAllProducts() {
         return productRepository.findAll().stream().map(ProductResponseDTO::new).toList();
     }
-
+    // TODO разобраться в секьюрити до конца:)
     public ProductResponseDTO getProductById(Long id) {
        Product product = productRepository.findById(id).orElseThrow(
                () -> new ProductNotFoundException("Product with id " + id + " not found"));

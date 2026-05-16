@@ -1,14 +1,20 @@
 package com.example.demo.service;
 
 import com.example.demo.Exceptions.OrderValidationException;
+import com.example.demo.Exceptions.ProblemsWithMail;
 import com.example.demo.Exceptions.ProductNotFoundException;
+import com.example.demo.Exceptions.UserNotFoundException;
 import com.example.demo.dto.*;
 import com.example.demo.models.Order;
 import com.example.demo.models.OrderStatus;
 import com.example.demo.models.Product;
+import com.example.demo.models.User;
 import com.example.demo.repository.OrderRepository;
 import com.example.demo.repository.ProductRepository;
+import com.example.demo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.List;
@@ -18,8 +24,13 @@ import java.util.List;
 public class OrderService {
     private final ProductRepository productRepository;
     private final OrderRepository orderRepository;
-
+    private final UserRepository userRepository;
     public OrderResponseDTO createOrder(OrderCreateDTO dto){
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email).orElseThrow(()-> new ProblemsWithMail("Email not found"));
+
         List<Product> products = productRepository.findAllById(dto.getProductIds());
       if(products.isEmpty()){
           throw new ProductNotFoundException("Products not found");
@@ -34,6 +45,9 @@ public class OrderService {
         Order order = new Order();
       order.setTotalPrice(total);
       order.setStatus(OrderStatus.CREATED);
+      order.setUser(user);
+
+
     for(Product p: products){
         p.setOrder(order);
     }
@@ -59,8 +73,16 @@ public class OrderService {
     }
 
     public OrderResponseDTO getOrderById(Long id){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("Not founded user"));
+
         Order order = orderRepository.findById(id).orElseThrow(()
                 -> new OrderValidationException("Order with id " + id + " not found!"));
+
+        if(!order.getUser().getId().equals(user.getId())){
+            throw new UserNotFoundException("Order by id " + id + " not found!");
+        }
         return new OrderResponseDTO(order);
     }
 
